@@ -16,7 +16,7 @@ class UserController {
     const schema = Yup.object().shape({
       email: Yup.string().email().required(),
       password: Yup.string().required().min(6),
-      name: Yup.string.required().min(6),
+      name: Yup.string().required().min(6),
     });
 
     if (!(await schema.isValid(req.body))) {

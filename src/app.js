@@ -3,8 +3,6 @@ import "dotenv/config";
 import express from "express";
 import http from "http";
 import cors from "cors";
-import "express-async-errors";
-
 import routes from "./routes";
 
 import "./database";

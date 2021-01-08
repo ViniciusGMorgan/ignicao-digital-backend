@@ -7,7 +7,7 @@ export default async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ error: "Token not driver" });
+    return res.status(401).json({ error: "Token not valid" });
   }
 
   const [, token] = authHeader.split(" ");
