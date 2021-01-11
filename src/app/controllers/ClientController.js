@@ -8,31 +8,38 @@ class ClientController {
     const Clients = await Client.findAll({
       limit: 20,
       offset: (page - 1) * 20,
-      order: [["order", "ASC"]],
     });
     return res.json(Clients);
   }
 
   async indexById(req, res) {
-    const Client = await Client.findByPk(req.params.ClientId);
+    const client = await Client.findByPk(req.params.clientId);
 
-    return res.json(Client);
+    return res.json(client);
   }
 
   async store(req, res) {
     const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string().required(),
+      email: Yup.string().email().required(),
       tags: Yup.string().required(),
+      name: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: "Verifique os campos enviados" });
     }
 
-    await Client.create(req.body);
+    const clientExists = await Client.findOne({
+      where: { email: req.body.email },
+    });
 
-    return res.status(200);
+    if (clientExists) {
+      return res.status(400).json({ error: "Usuário já existe" });
+    }
+
+    const { id, email, name } = await Client.create(req.body);
+
+    return res.json({ id, email, name });
   }
 
   async update(req, res) {
@@ -46,11 +53,19 @@ class ClientController {
       return res.status(400).json({ error: "Verifique os campos enviados" });
     }
 
-    const Client = await Client.findByPk(id);
+    const client = await Client.findByPk(req.body.id);
 
-    await Client.update(req.body);
+    const { id, email, tags, name } = await client.update(req.body);
 
-    return res.json(200);
+    return res.json({ id, email, tags, name });
+  }
+
+  async delete(req, res) {
+    const client = await Client.findByPk(req.params.clientId);
+
+    await client.destroy();
+
+    return res.json({ message: "Deletado com sucesso" });
   }
 }
 
